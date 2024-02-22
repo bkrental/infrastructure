@@ -1,0 +1,24 @@
+---
+- name: Remove unused Docker images
+  hosts: prod
+  remote_user: congdat
+
+  tasks:
+    - name: Get info on docker host and list images
+      community.docker.docker_host_info:
+        images: true
+      register: result
+
+    - name: Show images
+      ansible.builtin.debug:
+        var: result.images
+
+    - name: Prune everything
+      community.docker.docker_prune:
+        containers: true
+        images: true
+        images_filters:
+          dangling: false
+        networks: true
+        volumes: true
+        builder_cache: true

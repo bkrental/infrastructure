@@ -1,0 +1,25 @@
+- name: Deploy the backend application
+  hosts: all
+  remote_user: congdat
+
+  tasks:
+    - name: Copy the .env file
+      ansible.builtin.copy:
+        src: .env.dev
+        dest: /home/congdat/.env.dev
+        owner: congdat
+        mode: "0644"
+
+    - name: Create a backend container
+      community.docker.docker_container:
+        name: backend
+        image: congdat2409/rental-system-backend:latest
+        ports:
+          - "3000:3000"
+        env_file: /home/congdat/.env.dev
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+          interval: 30s
+          retries: 3
+          start_period: 30s
+          timeout: 30s
