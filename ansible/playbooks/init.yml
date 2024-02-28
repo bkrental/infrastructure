@@ -1,6 +1,6 @@
 ---
 - name: Install Docker on Ubuntu
-  hosts: dev
+  hosts: chatbot
   become: true
   remote_user: congdat
   vars:

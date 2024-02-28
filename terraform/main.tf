@@ -76,6 +76,28 @@ resource "google_compute_instance" "load_balancer" {
   }
 }
 
+resource "google_compute_instance" "chatbot_instance" {
+  name         = "bkrental-chatbot"
+  machine_type = "e2-small"
+  network_interface {
+    network    = google_compute_network.vpc.self_link
+    subnetwork = google_compute_subnetwork.public_subnet.self_link
+    access_config {
+    }
+  }
+  boot_disk {
+    auto_delete = true
+    initialize_params {
+      image = "ubuntu-2004-focal-v20240110"
+      size  = 15
+    }
+  }
+
+  metadata = {
+    ssh-keys = "congdat:${file("./scripts/INFRA_SSH_KEY.pub")}"
+  }
+}
+
 
 resource "google_compute_firewall" "public-fw" {
   name    = "bkrental-public-firewall"
@@ -99,4 +121,8 @@ output "prod_instance_ip" {
 
 output "load_balancer_ip" {
   value = google_compute_instance.load_balancer.network_interface.0.access_config.0.nat_ip
+}
+
+output "chatbot_instance_ip" {
+  value = google_compute_instance.chatbot_instance.network_interface.0.access_config.0.nat_ip
 }
